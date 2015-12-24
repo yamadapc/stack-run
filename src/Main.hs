@@ -1,18 +1,23 @@
 module Main
   where
 
+import qualified Data.ByteString.Char8                 as ByteString
+import           Data.Conduit
+import qualified Data.Conduit.Binary                   as Conduit.Binary
+import qualified Data.Conduit.List                     as Conduit.List
+import           Data.Conduit.Process
 import           Data.List
 import           Data.List.Utils
 import           Data.Maybe
 import           Distribution.PackageDescription
 import           Distribution.PackageDescription.Parse
+import           System.Console.ANSI
 import           System.Directory
 import           System.Directory.ProjectRoot
 import           System.Environment
 import           System.Exit
 import           System.FilePath
 import           System.IO
-import           System.Process
 
 usage :: String
 usage = unlines [ ""
@@ -52,15 +57,39 @@ findDefault = do
                 [] -> error "No executable found"
                 ((d, _):_) -> return d
 
+stackRun :: String -> [String] -> IO b
 stackRun name as = do
-    ph <- runCommand "stack build"
-    ec <- waitForProcess ph
+    setSGR [ SetColor Foreground Vivid White
+           , SetConsoleIntensity BoldIntensity
+           ]
+    putStr "$"
+    setSGR [Reset]
+    setSGR [SetColor Foreground Vivid Cyan]
+    putStrLn " stack build"
+    setSGR [Reset]
+    (Inherited, out, err, cph) <- streamingProcess (shell "stack build")
+    out =$= Conduit.Binary.lines $$ Conduit.List.mapM_ putLineGray
+    err =$= Conduit.Binary.lines $$ Conduit.List.mapM_ putLineRed
+    ec <- waitForStreamingProcess cph
     case ec of
         ExitSuccess ->
-            runCommand ("stack exec " ++ name ++ " -- " ++ (join " " as)) >>=
+            setSGR [Reset] >>
+            hFlush stdout >>
+            runCommand ("stack exec " ++ name ++ " -- " ++ join " " as) >>=
             waitForProcess >>=
             exitWith
         f -> exitWith f
+  where
+    putLineGray b = do
+        setSGR [SetColor Foreground Dull White]
+        putStr "  "
+        ByteString.putStrLn b
+        setSGR [Reset]
+    putLineRed b = do
+        setSGR [SetColor Foreground Vivid Black]
+        putStr "  "
+        ByteString.putStrLn b
+        setSGR [Reset]
 
 main :: IO ()
 main = do
