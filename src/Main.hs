@@ -1,6 +1,7 @@
 module Main
   where
 
+import           Control.Applicative                   ((<$>))
 import           Control.Monad                         (unless)
 import qualified Data.ByteString.Char8                 as ByteString
 import           Data.Conduit
