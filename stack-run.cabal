@@ -1,7 +1,10 @@
 name:                stack-run
 version:             0.1.0.0
 synopsis:            An equivalent to cabal run for stack.
--- description:         
+description:         Finds the project root, compiles your code and runs the
+                     first or set default executable. It's a shorthand for
+                     @stack build && stack run executable@, much like
+                     @cabal run@.
 homepage:            https://github.com/yamadapc/stack-run
 license:             MIT
 license-file:        LICENSE
