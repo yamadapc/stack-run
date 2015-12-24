@@ -3,10 +3,19 @@
 - - -
 Like `cabal run` but for `stack`.
 
-## Usage
+## Installing
+```
+$ stack install stack-run
+```
 
+## Usage
 ```
 $ stack run
+```
+
+## Help
+```
+$ stack run help
 ```
 
 ## Demo
