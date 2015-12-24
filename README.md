@@ -3,5 +3,14 @@
 - - -
 Like `cabal run` but for `stack`.
 
+## Usage
+
+```
+$ stack run
+```
+
+## Demo
+![](/demo.gif)
+
 ## License
 This code is published under the MIT license.
