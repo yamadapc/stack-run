@@ -1,6 +1,7 @@
 module Main
   where
 
+import           Control.Monad                         (unless)
 import qualified Data.ByteString.Char8                 as ByteString
 import           Data.Conduit
 import qualified Data.Conduit.Binary                   as Conduit.Binary
@@ -59,18 +60,14 @@ findDefault = do
 
 stackRun :: String -> [String] -> IO b
 stackRun name as = do
-    setSGR [ SetColor Foreground Vivid White
-           , SetConsoleIntensity BoldIntensity
-           ]
-    putStr "$"
-    setSGR [Reset]
-    setSGR [SetColor Foreground Vivid Cyan]
-    putStrLn " stack build"
-    setSGR [Reset]
-    (Inherited, out, err, cph) <- streamingProcess (shell "stack build")
-    out =$= Conduit.Binary.lines $$ Conduit.List.mapM_ putLineGray
-    err =$= Conduit.Binary.lines $$ Conduit.List.mapM_ putLineRed
-    ec <- waitForStreamingProcess cph
+    pr <- fromMaybe (error "No project root found") <$> getProjectRootCurrent
+    stackYmlExists <- doesFileExist (pr </> "stack.yaml")
+    unless stackYmlExists $ do
+        ec <- prettyRunCommand "stack init"
+        case ec of
+            ExitSuccess -> return ()
+            f -> exitWith f
+    ec <- prettyRunCommand "stack build"
     case ec of
         ExitSuccess ->
             setSGR [Reset] >>
@@ -79,17 +76,29 @@ stackRun name as = do
             waitForProcess >>=
             exitWith
         f -> exitWith f
+
+prettyRunCommand :: String -> IO ExitCode
+prettyRunCommand cmd = do
+    setSGR [ SetColor Foreground Vivid White
+           , SetConsoleIntensity BoldIntensity
+           ]
+    putStr "$ "
+    setSGR [Reset]
+    setSGR [SetColor Foreground Vivid Cyan]
+    putStrLn cmd
+    setSGR [Reset]
+    (Inherited, out, err, cph) <- streamingProcess (shell cmd)
+    out =$= Conduit.Binary.lines $$ Conduit.List.mapM_ putLineGray
+    err =$= Conduit.Binary.lines $$ Conduit.List.mapM_ putLineRed
+    waitForStreamingProcess cph
   where
-    putLineGray b = do
-        setSGR [SetColor Foreground Dull White]
+    putLineSGR sgr b = do
+        setSGR sgr
         putStr "  "
         ByteString.putStrLn b
         setSGR [Reset]
-    putLineRed b = do
-        setSGR [SetColor Foreground Vivid Black]
-        putStr "  "
-        ByteString.putStrLn b
-        setSGR [Reset]
+    putLineGray = putLineSGR [SetColor Foreground Dull White]
+    putLineRed = putLineSGR [SetColor Foreground Vivid Black]
 
 main :: IO ()
 main = do
