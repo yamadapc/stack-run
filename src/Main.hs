@@ -111,6 +111,7 @@ main = do
             exitFailure
         ("get-default":_) -> putStrLn =<< findDefault
         ("--help":_) -> exitUsage
+        ("-h":_) -> exitUsage
         ("help":_) -> exitUsage
         ("--":name:as) -> stackRun name as
         (name:as) -> stackRun name as
