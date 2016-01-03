@@ -110,9 +110,12 @@ main = do
             hPutStrLn stderr "Missing required parameter: <name>"
             exitFailure
         ("get-default":_) -> putStrLn =<< findDefault
-        ("help":_) -> do
-            putStrLn usage
-            exitSuccess
+        ("--help":_) -> exitUsage
+        ("help":_) -> exitUsage
         ("--":name:as) -> stackRun name as
         (name:as) -> stackRun name as
         [] -> flip stackRun [] =<< findDefault
+  where
+    exitUsage = do
+        putStr usage
+        exitSuccess
