@@ -120,6 +120,7 @@ main = do
         ("--help":_) -> exitUsage
         ("-h":_) -> exitUsage
         ("help":_) -> exitUsage
+        ("--":"--":as) -> flip stackRun as =<< findDefault
         ("--":name:as) -> stackRun name as
         (name:as) -> stackRun name as
         [] -> flip stackRun [] =<< findDefault
