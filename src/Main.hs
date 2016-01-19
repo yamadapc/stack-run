@@ -23,13 +23,14 @@ import           System.IO
 
 usage :: String
 usage = unlines [ ""
-                , "  Usage: stack run [name]"
+                , "  Usage: stack run <name|sub-command> [args]"
                 , ""
                 , "  Commands:"
                 , ""
-                , "    stack run [name]             Compiles and runs the executable specified or the default"
+                , "    stack run [name] [args]      Compiles and runs the executable specified or the default"
                 , "    stack run set-default <name> Sets the default executable to run"
-                , "    stack run -- <name>          Like stack run, but will never match a sub-command"
+                , "    stack run -- <name> [args]   Like stack run, but will never match a sub-command"
+                , "    stack run -- -- [args]       Pass-in arguments to the default executable"
                 , ""
                 ]
 
@@ -71,10 +72,10 @@ stackRun name as = do
     ec <- prettyRunCommand "stack build"
     case ec of
         ExitSuccess -> do
-            setSGR [Reset]
-            hFlush stdout
             let cmd = "stack exec " ++ name ++ " -- " ++ join " " as
             logCommand cmd
+            setSGR [Reset]
+            hFlush stdout
             ph <- runCommand cmd
             ec' <- waitForProcess ph
             exitWith ec'
