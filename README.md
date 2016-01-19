@@ -21,7 +21,7 @@ $ stack run help
 ```
 
 ## Demo
-![](/demo.gif)
+![](http://i.imgur.com/CxtaQIq.gif)
 
 ## License
 This code is published under the MIT license.
