@@ -32,6 +32,10 @@ usage = unlines [ ""
                 , "    stack run -- <name> [args]   Like stack run, but will never match a sub-command"
                 , "    stack run -- -- [args]       Pass-in arguments to the default executable"
                 , ""
+                , "    stack run help               Print this help message"
+                , "    stack run --help"
+                , "    stack run -h"
+                , ""
                 ]
 
 setDefault :: String -> IO ()
