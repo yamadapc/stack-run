@@ -74,8 +74,8 @@ stackRun name as = do
         ExitSuccess -> do
             let cmd = "stack exec " ++ name ++ " -- " ++ join " " as
             logCommand cmd
-            setSGR [Reset]
-            hFlush stdout
+            hSetSGR stderr [Reset]
+            hFlush stderr
             ph <- runCommand cmd
             ec' <- waitForProcess ph
             exitWith ec'
@@ -90,23 +90,23 @@ prettyRunCommand cmd = do
     waitForStreamingProcess cph
   where
     putLineSGR sgr b = do
-        setSGR sgr
-        putStr "  "
-        ByteString.putStrLn b
-        setSGR [Reset]
+        hSetSGR stderr sgr
+        hPutStr stderr "  "
+        ByteString.hPutStrLn stderr b
+        hSetSGR stderr [Reset]
     putLineGray = putLineSGR [SetColor Foreground Dull White]
     putLineRed = putLineSGR [SetColor Foreground Vivid Black]
 
 logCommand :: String -> IO ()
 logCommand cmd = do
-    setSGR [ SetColor Foreground Vivid White
-           , SetConsoleIntensity BoldIntensity
-           ]
-    putStr "$ "
-    setSGR [Reset]
-    setSGR [SetColor Foreground Vivid Cyan]
-    putStrLn cmd
-    setSGR [Reset]
+    hSetSGR stderr [ SetColor Foreground Vivid White
+                   , SetConsoleIntensity BoldIntensity
+                   ]
+    hPutStr stderr "$ "
+    hSetSGR stderr [Reset]
+    hSetSGR stderr [SetColor Foreground Vivid Cyan]
+    hPutStrLn stderr cmd
+    hSetSGR stderr [Reset]
 
 main :: IO ()
 main = do
