@@ -70,24 +70,19 @@ stackRun name as = do
             f -> exitWith f
     ec <- prettyRunCommand "stack build"
     case ec of
-        ExitSuccess ->
-            setSGR [Reset] >>
-            hFlush stdout >>
-            runCommand ("stack exec " ++ name ++ " -- " ++ join " " as) >>=
-            waitForProcess >>=
-            exitWith
+        ExitSuccess -> do
+            setSGR [Reset]
+            hFlush stdout
+            let cmd = "stack exec " ++ name ++ " -- " ++ join " " as
+            logCommand cmd
+            ph <- runCommand cmd
+            ec' <- waitForProcess ph
+            exitWith ec'
         f -> exitWith f
 
 prettyRunCommand :: String -> IO ExitCode
 prettyRunCommand cmd = do
-    setSGR [ SetColor Foreground Vivid White
-           , SetConsoleIntensity BoldIntensity
-           ]
-    putStr "$ "
-    setSGR [Reset]
-    setSGR [SetColor Foreground Vivid Cyan]
-    putStrLn cmd
-    setSGR [Reset]
+    logCommand cmd
     (Inherited, out, err, cph) <- streamingProcess (shell cmd)
     out =$= Conduit.Binary.lines $$ Conduit.List.mapM_ putLineGray
     err =$= Conduit.Binary.lines $$ Conduit.List.mapM_ putLineRed
@@ -100,6 +95,17 @@ prettyRunCommand cmd = do
         setSGR [Reset]
     putLineGray = putLineSGR [SetColor Foreground Dull White]
     putLineRed = putLineSGR [SetColor Foreground Vivid Black]
+
+logCommand :: String -> IO ()
+logCommand cmd = do
+    setSGR [ SetColor Foreground Vivid White
+           , SetConsoleIntensity BoldIntensity
+           ]
+    putStr "$ "
+    setSGR [Reset]
+    setSGR [SetColor Foreground Vivid Cyan]
+    putStrLn cmd
+    setSGR [Reset]
 
 main :: IO ()
 main = do
