@@ -1,4 +1,4 @@
-FROM haskell:7.8
+FROM haskell:7.10
 RUN ["cabal", "update"]
 ADD . /app
 WORKDIR /app
