@@ -56,7 +56,7 @@ findDefault = do
     findDefault' pr = do
         cfp <- fromMaybe (error "No cabal file found") <$>
             (find ((== ".cabal") . takeExtension) <$> getDirectoryContents pr)
-        getPackageDescription cfp >>= getDefaultExecutable
+        getPackageDescription (pr </> cfp) >>= getDefaultExecutable
           where
             getPackageDescription p = parsePackageDescription <$> readFile p
             getDefaultExecutable (ParseFailed _) =
