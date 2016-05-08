@@ -10,7 +10,7 @@ license:             MIT
 license-file:        LICENSE
 author:              Pedro Tacla Yamada
 maintainer:          tacla.yamada@gmail.com
-copyright:           Copyright (c) 2015 Pedro Tacla Yamada
+copyright:           Copyright (c) 2016 Pedro Tacla Yamada
 category:            Development
 build-type:          Simple
 extra-source-files:  README.md
