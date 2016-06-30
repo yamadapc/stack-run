@@ -16,6 +16,7 @@ import           Data.Time
 import           Distribution.PackageDescription
 import           Distribution.PackageDescription.Parse
 import           System.Console.ANSI
+import           System.Console.Questioner
 import           System.Directory
 import           System.Directory.ProjectRoot
 import           System.Environment
@@ -34,6 +35,9 @@ usage = unlines [ ""
                 , "    stack run -- -- [args]       Pass-in arguments to the default executable"
                 , ""
                 , "    stack run set-default <name> Sets the default executable to run"
+                , ""
+                , "    stack run --interactive      Runs in interactive mode"
+                , "    stack run -i"
                 , ""
                 , "    stack run help               Print this help message"
                 , "    stack run --help"
@@ -66,6 +70,22 @@ findDefault = do
             getDefaultExecutable (ParseOk _ gpd) = case condExecutables gpd of
                 [] -> error "No executable found"
                 ((d, _):_) -> return d
+
+getExecutables :: IO [String]
+getExecutables = do
+    pr <- fromMaybe (error "No project root found") <$>
+        getProjectRootCurrent
+    cfp <- fromMaybe (error "No cabal file found") <$>
+        (find ((== ".cabal") . takeExtension) <$> getDirectoryContents pr)
+    pkgParseResult <- getPackageDescription (pr </> cfp)
+    return $ getExecutables pkgParseResult
+  where
+    getPackageDescription p = parsePackageDescription <$> readFile p
+    getExecutables (ParseFailed _) =
+        error "Failed to parse cabal file"
+    getExecutables (ParseOk _ gpd) = case condExecutables gpd of
+        [] -> error "No executables found"
+        ds -> map fst ds
 
 stackRun :: String -> [String] -> IO b
 stackRun name as = do
@@ -131,6 +151,12 @@ logCommand cmd = do
     hPutStrLn stderr cmd
     hSetSGR stderr [Reset]
 
+runInteractive :: [String] -> IO ()
+runInteractive as = do
+    exs <- getExecutables
+    ex <- prompt ("What executable should we run? ", exs)
+    stackRun ex as
+
 main :: IO ()
 main = do
     args <- getArgs
@@ -142,6 +168,8 @@ main = do
         ("get-default":_) -> putStrLn =<< findDefault
         ("--help":_) -> exitUsage
         ("-h":_) -> exitUsage
+        ("-i":as) -> runInteractive as
+        ("--interactive":as) -> runInteractive as
         ("help":_) -> exitUsage
         ("--":"--":as) -> flip stackRun as =<< findDefault
         ("--":name:as) -> stackRun name as
