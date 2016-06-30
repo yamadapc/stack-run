@@ -32,6 +32,7 @@ executable stack-run
                      , filepath
                      , projectroot >= 0.2
                      , time >= 1.5.0.1
+                     , questioner
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:       -threaded
