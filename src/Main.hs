@@ -12,6 +12,7 @@ import           Data.Conduit.Process
 import           Data.List
 import           Data.List.Utils
 import           Data.Maybe
+import           Data.Time
 import           Distribution.PackageDescription
 import           Distribution.PackageDescription.Parse
 import           System.Console.ANSI
@@ -75,7 +76,12 @@ stackRun name as = do
         case ec of
             ExitSuccess -> return ()
             f -> exitWith f
+    start <- getCurrentTime
     ec <- prettyRunCommand "stack build"
+    hSetSGR stderr [SetColor Foreground Vivid Black]
+    fdiff <- getDiffTime start
+    hPutStrLn stderr ("stack build took " ++ show fdiff ++ "ms")
+    hSetSGR stderr [Reset]
     case ec of
         ExitSuccess -> do
             let cmd = "stack exec " ++ name ++ " -- " ++ join " " as
@@ -86,6 +92,15 @@ stackRun name as = do
             ec' <- waitForProcess ph
             exitWith ec'
         f -> exitWith f
+  where
+    getDiffTime :: UTCTime -> IO Integer
+    getDiffTime start = do
+        now <- getCurrentTime
+        let diff :: Double
+            diff = fromRational (toRational (diffUTCTime now start))
+            fdiff = floor (diff * 1000)
+        return fdiff
+
 
 prettyRunCommand :: String -> IO ExitCode
 prettyRunCommand cmd = do
