@@ -1,7 +1,8 @@
 module Main
   where
 
-import           Control.Applicative                   ((<$>))
+import           Control.Applicative                   ((*>), (<$>))
+import           Control.Concurrent.Async
 import           Control.Monad                         (unless)
 import qualified Data.ByteString.Char8                 as ByteString
 import           Data.Conduit
@@ -88,11 +89,13 @@ stackRun name as = do
 
 prettyRunCommand :: String -> IO ExitCode
 prettyRunCommand cmd = do
+    hSetBuffering stderr LineBuffering
     logCommand cmd
     (Inherited, out, err, cph) <- streamingProcess (shell cmd)
-    out =$= Conduit.Binary.lines $$ Conduit.List.mapM_ putLineGray
-    err =$= Conduit.Binary.lines $$ Conduit.List.mapM_ putLineRed
-    waitForStreamingProcess cph
+    runConcurrently $
+        Concurrently (out $$ (Conduit.Binary.lines =$ Conduit.List.mapM_ putLineGray)) *>
+        Concurrently (err $$ (Conduit.Binary.lines =$ Conduit.List.mapM_ putLineRed)) *>
+        Concurrently (waitForStreamingProcess cph)
   where
     putLineSGR sgr b = do
         hSetSGR stderr sgr
