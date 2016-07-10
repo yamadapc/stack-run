@@ -21,6 +21,9 @@ tested-with: GHC >= 7.6
 executable stack-run
   main-is:             Main.hs
   build-depends:       Cabal
+                     , terminal-size
+                     , vty
+                     , stm
                      , MissingH
                      , ansi-terminal >= 0.6
                      , async
