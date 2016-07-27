@@ -20,6 +20,7 @@ tested-with: GHC >= 7.6
 
 executable stack-run
   main-is:             Main.hs
+  other-modules: System.Console.Questioner
   build-depends:       Cabal
                      , terminal-size
                      , vty
