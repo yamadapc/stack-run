@@ -15,6 +15,11 @@ $ stack install stack-run
 $ stack run
 ```
 
+## Interactive Usage
+```
+$ stack run -i
+```
+
 ## Help
 ```
 $ stack run help
@@ -22,6 +27,9 @@ $ stack run help
 
 ## Demo
 ![](http://i.imgur.com/CxtaQIq.gif)
+
+## Interactive Demo
+![](http://i.imgur.com/Ph8LAXU.gif)
 
 ## License
 This code is published under the MIT license.
