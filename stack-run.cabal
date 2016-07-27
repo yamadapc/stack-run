@@ -21,6 +21,9 @@ tested-with: GHC >= 7.6
 executable stack-run
   main-is:             Main.hs
   other-modules: System.Console.Questioner
+               , System.Console.Questioner.Autocomplete
+               , System.Console.Questioner.ProgressIndicators
+               , System.Console.Questioner.Util
   build-depends:       Cabal
                      , terminal-size
                      , vty
