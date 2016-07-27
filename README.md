@@ -3,7 +3,9 @@
 [![Hackage](https://img.shields.io/hackage/v/stack-run.svg)](http://hackage.haskell.org/package/stack-run)
 [![Hackage Deps](https://img.shields.io/hackage-deps/v/stack-run.svg)](http://packdeps.haskellers.com/feed?needle=stack-run)
 - - -
-Like `cabal run` but for `stack`.
+**stack-run** is like `cabal run` but for `stack`.
+
+Only **GHC** versions **>= 7.8** are currently supported.
 
 ## Installing
 ```
