@@ -134,7 +134,7 @@ listPrompt question options = setup $ do
             e <- atomically (readTChan c)
             case e of
                 EvKey KEnter _ -> do
-                    makeChoice
+                    -- makeChoice
                     return (Just (fst os))
                 EvKey (KChar 'n') [MCtrl] -> do
                     clearFromCursorTo $ length $ snd os
@@ -160,9 +160,7 @@ listPrompt question options = setup $ do
                     return Nothing
                 EvKey KEsc _ ->
                     return Nothing
-                _ -> do
-                    clearFromCursorTo $ length $ snd os
-                    go c os
+                _ -> go c os
 
         makeChoice = forM_ (replicate (length (snd selection)) ())
             (const (clearLine >> cursorUpLine 1))
