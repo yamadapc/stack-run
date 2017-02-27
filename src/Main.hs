@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 module Main
   where
 
@@ -16,7 +17,9 @@ import           Data.Time
 import           Distribution.PackageDescription
 import           Distribution.PackageDescription.Parse
 import           System.Console.ANSI
+#ifndef OS_Win32
 import           System.Console.Questioner
+#endif
 import           System.Directory
 import           System.Directory.ProjectRoot
 import           System.Environment
@@ -151,11 +154,13 @@ logCommand cmd = do
     hPutStrLn stderr cmd
     hSetSGR stderr [Reset]
 
+#ifndef OS_Win32
 runInteractive :: [String] -> IO ()
 runInteractive as = do
     exs <- getExecutables
     ex <- prompt ("What executable should we run? ", exs)
     stackRun ex as
+#endif
 
 main :: IO ()
 main = do
@@ -168,8 +173,10 @@ main = do
         ("get-default":_) -> putStrLn =<< findDefault
         ("--help":_) -> exitUsage
         ("-h":_) -> exitUsage
+#ifndef OS_Win32
         ("-i":as) -> runInteractive as
         ("--interactive":as) -> runInteractive as
+#endif
         ("help":_) -> exitUsage
         ("--":"--":as) -> flip stackRun as =<< findDefault
         ("--":name:as) -> stackRun name as

@@ -20,13 +20,13 @@ tested-with: GHC >= 7.6
 
 executable stack-run
   main-is:             Main.hs
-  other-modules: System.Console.Questioner
-               , System.Console.Questioner.Autocomplete
-               , System.Console.Questioner.ProgressIndicators
-               , System.Console.Questioner.Util
+  if ! os(windows)
+    other-modules: System.Console.Questioner
+                 , System.Console.Questioner.Autocomplete
+                 , System.Console.Questioner.ProgressIndicators
+                 , System.Console.Questioner.Util
   build-depends:       Cabal
                      , terminal-size
-                     , vty
                      , stm
                      , MissingH
                      , ansi-terminal >= 0.6
@@ -39,6 +39,8 @@ executable stack-run
                      , filepath
                      , projectroot >= 0.2
                      , time >= 1.5.0.1
+  if ! os(windows)
+    build-depends:     vty
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:       -threaded
