@@ -5,7 +5,7 @@
 - - -
 **stack-run** is like `cabal run` but for `stack`.
 
-Only **UNIX** and **GHC** versions **>= 7.8** are currently supported.
+Only **UNIX** and **GHC** versions **>= 7.10** are currently supported.
 
 ## Installing
 ```
