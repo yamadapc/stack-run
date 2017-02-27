@@ -1,5 +1,6 @@
 # stack-run
 [![Build Status](https://travis-ci.org/yamadapc/stack-run.svg?branch=master)](https://travis-ci.org/yamadapc/stack-run)
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/y4fu37moed6m912m?svg=true)](https://ci.appveyor.com/project/yamadapc/stack-run)
 [![Hackage](https://img.shields.io/hackage/v/stack-run.svg)](http://hackage.haskell.org/package/stack-run)
 [![Hackage Deps](https://img.shields.io/hackage-deps/v/stack-run.svg)](http://packdeps.haskellers.com/feed?needle=stack-run)
 - - -
