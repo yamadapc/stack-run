@@ -1,3 +1,0 @@
-[submodule "questioner"]
-	path = questioner
-	url = https://github.com/yamadapc/haskell-questioner

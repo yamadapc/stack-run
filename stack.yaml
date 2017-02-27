@@ -1,7 +1,6 @@
 resolver: lts-3.18
 packages:
 - '.'
-- './questioner'
 extra-deps:
 - projectroot-0.2.0.1
 - vty-5.7.1
