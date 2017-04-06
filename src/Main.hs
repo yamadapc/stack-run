@@ -21,11 +21,11 @@ import           System.Console.ANSI
 import           System.Console.Questioner
 #endif
 import           System.Directory
-import           System.Directory.ProjectRoot
 import           System.Environment
 import           System.Exit
 import           System.FilePath
 import           System.IO
+import           System.IO.Error
 
 usage :: String
 usage = unlines [ ""
@@ -51,13 +51,13 @@ usage = unlines [ ""
 setDefault :: String -> IO ()
 setDefault name = do
     pr <- fromMaybe (error "No project root found") <$>
-        getProjectRootCurrent
+        getCabalProjectRootCurrent
     writeFile (pr </> ".stack-work" </> ".stack-run-default") name
 
 findDefault :: IO String
 findDefault = do
     pr <- fromMaybe (error "No project root found") <$>
-        getProjectRootCurrent
+        getCabalProjectRootCurrent
     e <- doesFileExist (pr </> ".stack-work" </> ".stack-run-default")
     if e then readFile (pr </> ".stack-work" </> ".stack-run-default")
          else findDefault' pr
@@ -77,7 +77,7 @@ findDefault = do
 getExecutables :: IO [String]
 getExecutables = do
     pr <- fromMaybe (error "No project root found") <$>
-        getProjectRootCurrent
+        getCabalProjectRootCurrent
     cfp <- fromMaybe (error "No cabal file found") <$>
         (find ((== ".cabal") . takeExtension) <$> getDirectoryContents pr)
     pkgParseResult <- getPackageDescription (pr </> cfp)
@@ -90,9 +90,23 @@ getExecutables = do
         [] -> error "No executables found"
         ds -> map fst ds
 
+getCabalProjectRootCurrent :: IO (Maybe FilePath)
+getCabalProjectRootCurrent = flip catchIOError (const (return Nothing)) $
+  getCurrentDirectory >>= getCabalProjectRoot
+  where
+    getCabalProjectRoot :: FilePath -> IO (Maybe FilePath)
+    getCabalProjectRoot path = do
+      hasCabal <- any (isSuffixOf ".cabal") <$> getDirectoryContents path
+      if hasCabal
+        then return $ Just path
+        else let parent = takeDirectory path in
+          if parent /= path
+            then getCabalProjectRoot parent
+            else return Nothing
+
 stackRun :: String -> [String] -> IO b
 stackRun name as = do
-    pr <- fromMaybe (error "No project root found") <$> getProjectRootCurrent
+    pr <- fromMaybe (error "No project root found") <$> getCabalProjectRootCurrent
     stackYmlExists <- doesFileExist (pr </> "stack.yaml")
     unless stackYmlExists $ do
         ec <- prettyRunCommand "stack init"
