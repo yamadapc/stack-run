@@ -1,8 +1,5 @@
-resolver: lts-3.18
+resolver: lts-8.13
 packages:
 - '.'
-extra-deps:
-- projectroot-0.2.0.1
-- vty-5.7.1
 flags: {}
 extra-package-dbs: []
