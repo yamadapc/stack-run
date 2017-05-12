@@ -40,7 +40,12 @@ executable stack-run
                      , time >= 1.5.0.1
   if ! os(windows)
     build-depends:     vty
-  hs-source-dirs:      src
+  hs-source-dirs:
+    src
+  if ! os(windows)
+    hs-source-dirs:
+      src
+      unix
   default-language:    Haskell2010
   ghc-options:       -threaded
 
