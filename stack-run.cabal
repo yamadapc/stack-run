@@ -20,11 +20,6 @@ tested-with: GHC >= 7.6
 
 executable stack-run
   main-is:             Main.hs
-  if ! os(windows)
-    other-modules: System.Console.Questioner
-                 , System.Console.Questioner.Autocomplete
-                 , System.Console.Questioner.ProgressIndicators
-                 , System.Console.Questioner.Util
   build-depends:       Cabal
                      , terminal-size
                      , stm
@@ -38,11 +33,16 @@ executable stack-run
                      , directory
                      , filepath
                      , time >= 1.5.0.1
+  if os(windows)
+    CPP-Options:      -DOS_Win32
+    hs-source-dirs:
+      src
   if ! os(windows)
+    other-modules: System.Console.Questioner
+                 , System.Console.Questioner.Autocomplete
+                 , System.Console.Questioner.ProgressIndicators
+                 , System.Console.Questioner.Util
     build-depends:     vty
-  hs-source-dirs:
-    src
-  if ! os(windows)
     hs-source-dirs:
       src
       unix
