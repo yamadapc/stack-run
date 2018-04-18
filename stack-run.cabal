@@ -1,5 +1,5 @@
 name:                stack-run
-version:             0.1.1.4
+version:             0.1.1.5
 synopsis:            An equivalent to cabal run for stack.
 description:         Finds the project root, compiles your code and runs the
                      first or set default executable. It's a shorthand for
@@ -28,8 +28,8 @@ executable stack-run
                      , async
                      , base >=4 && <5
                      , bytestring >= 0.10
-                     , conduit > 1.1 && < 1.3
-                     , conduit-extra >= 1.1 && < 1.2
+                     , conduit > 1.3 && < 1.4
+                     , conduit-extra >= 1.3 && < 1.4
                      , directory
                      , filepath
                      , time >= 1.5.0.1
