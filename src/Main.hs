@@ -16,6 +16,7 @@ import           Data.Maybe
 import           Data.Time
 import           Distribution.PackageDescription
 import           Distribution.PackageDescription.Parse
+import           Distribution.Types.UnqualComponentName
 import           System.Console.ANSI
 #ifndef OS_Win32
 import           System.Console.Questioner
@@ -72,7 +73,7 @@ findDefault = do
                 error "Failed to parse cabal file"
             getDefaultExecutable (ParseOk _ gpd) = case condExecutables gpd of
                 [] -> error "No executable found"
-                ((d, _):_) -> return d
+                ((d, _):_) -> return (unUnqualComponentName d)
 
 getExecutables :: IO [String]
 getExecutables = do
@@ -88,7 +89,7 @@ getExecutables = do
         error "Failed to parse cabal file"
     getExecutables (ParseOk _ gpd) = case condExecutables gpd of
         [] -> error "No executables found"
-        ds -> map fst ds
+        ds -> map (unUnqualComponentName . fst) ds
 
 getCabalProjectRootCurrent :: IO (Maybe FilePath)
 getCabalProjectRootCurrent = flip catchIOError (const (return Nothing)) $
