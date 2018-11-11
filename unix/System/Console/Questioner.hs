@@ -1,7 +1,5 @@
 {-# LANGUAGE FlexibleInstances     #-}
-{-# LANGUAGE LambdaCase            #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverlappingInstances  #-}
 module System.Console.Questioner
     (
       Question(..)
@@ -133,9 +131,7 @@ listPrompt question options = setup $ do
             hFlush stdout
             e <- atomically (readTChan c)
             case e of
-                EvKey KEnter _ -> do
-                    -- makeChoice
-                    return (Just (fst os))
+                EvKey KEnter _ -> return (Just (fst os))
                 EvKey (KChar 'n') [MCtrl] -> do
                     clearFromCursorTo $ length $ snd os
                     go c (updateSelection MoveDown os)
@@ -179,7 +175,7 @@ listPrompt question options = setup $ do
                 setSGR [ SetColor Foreground Vivid Cyan
                        , SetConsoleIntensity NormalIntensity
                        ]
-                putStrLn $ o
+                putStrLn o
                 setSGR []
             else putStrLn $ "  " ++ o
 
