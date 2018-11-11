@@ -16,7 +16,7 @@ build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
 
-tested-with: GHC >= 7.6
+tested-with: GHC >= 8.4.4
 
 executable stack-run
   main-is:             Main.hs
