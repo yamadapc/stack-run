@@ -1,7 +1,6 @@
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE LambdaCase            #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverlappingInstances  #-}
 module System.Console.Questioner
     (
       Question(..)
@@ -15,7 +14,6 @@ module System.Console.Questioner
     )
   where
 
-import           Control.Applicative                          ((<$>))
 import           Control.Concurrent.STM
 import           Control.Monad                                (forM_, (>=>))
 import           Data.List                                    (delete)
@@ -162,9 +160,9 @@ listPrompt question options = setup $ do
                     return Nothing
                 _ -> go c os
 
-        makeChoice = forM_ (replicate (length (snd selection)) ())
-            (const (clearLine >> cursorUpLine 1))
-
+--        makeChoice = forM_ (replicate (length (snd selection)) ())
+--            (const (clearLine >> cursorUpLine 1))
+--
     updateSelection MoveUp   (i, os) = ((i - 1) `mod` length os, os)
     updateSelection MoveDown (i, os) = ((i + 1) `mod` length os, os)
     updateSelection _ _ = error "Internal error, key not recognized"
