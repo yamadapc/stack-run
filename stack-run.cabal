@@ -1,5 +1,5 @@
 name:                stack-run
-version:             0.1.1.4
+version:             0.2
 synopsis:            An equivalent to cabal run for stack.
 description:         Finds the project root, compiles your code and runs the
                      first or set default executable. It's a shorthand for
@@ -8,9 +8,9 @@ description:         Finds the project root, compiles your code and runs the
 homepage:            https://github.com/yamadapc/stack-run
 license:             MIT
 license-file:        LICENSE
-author:              Pedro Tacla Yamada
-maintainer:          tacla.yamada@gmail.com
-copyright:           Copyright (c) 2016 Pedro Tacla Yamada
+author:              Pedro Tacla Yamada <tacla.yamada@gmail.com>
+maintainer:          Magicloud <magiclouds@gmail.com>
+copyright:           Copyright (c) 2016 Pedro Tacla Yamada, 2019 Magicloud
 category:            Development
 build-type:          Simple
 extra-source-files:  README.md
@@ -28,8 +28,8 @@ executable stack-run
                      , async
                      , base >=4 && <5
                      , bytestring >= 0.10
-                     , conduit > 1.1 && < 1.3
-                     , conduit-extra >= 1.1 && < 1.2
+                     , conduit
+                     , conduit-extra
                      , directory
                      , filepath
                      , time >= 1.5.0.1
@@ -47,7 +47,7 @@ executable stack-run
       src
       unix
   default-language:    Haskell2010
-  ghc-options:       -threaded
+  ghc-options:       -threaded -Wall
 
 source-repository head
   type:     git

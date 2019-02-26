@@ -15,7 +15,9 @@ import           Data.List.Utils
 import           Data.Maybe
 import           Data.Time
 import           Distribution.PackageDescription
-import           Distribution.PackageDescription.Parse
+import           Distribution.PackageDescription.Parsec
+import           Distribution.Types.UnqualComponentName
+import           Distribution.Verbosity
 import           System.Console.ANSI
 #ifndef OS_Win32
 import           System.Console.Questioner
@@ -60,17 +62,15 @@ findDefault = do
         getCabalProjectRootCurrent
     e <- doesFileExist (pr </> ".stack-work" </> ".stack-run-default")
     if e then readFile (pr </> ".stack-work" </> ".stack-run-default")
-         else findDefault' pr
+         else unUnqualComponentName <$> findDefault' pr
   where
     findDefault' pr = do
         cfp <- fromMaybe (error "No cabal file found") <$>
             (find ((== ".cabal") . takeExtension) <$> getDirectoryContents pr)
         getPackageDescription (pr </> cfp) >>= getDefaultExecutable
           where
-            getPackageDescription p = parsePackageDescription <$> readFile p
-            getDefaultExecutable (ParseFailed _) =
-                error "Failed to parse cabal file"
-            getDefaultExecutable (ParseOk _ gpd) = case condExecutables gpd of
+            getPackageDescription = readGenericPackageDescription silent
+            getDefaultExecutable gpd = case condExecutables gpd of
                 [] -> error "No executable found"
                 ((d, _):_) -> return d
 
@@ -81,12 +81,10 @@ getExecutables = do
     cfp <- fromMaybe (error "No cabal file found") <$>
         (find ((== ".cabal") . takeExtension) <$> getDirectoryContents pr)
     pkgParseResult <- getPackageDescription (pr </> cfp)
-    return $ getExecutables pkgParseResult
+    return $ map unUnqualComponentName $ getExecutables' pkgParseResult
   where
-    getPackageDescription p = parsePackageDescription <$> readFile p
-    getExecutables (ParseFailed _) =
-        error "Failed to parse cabal file"
-    getExecutables (ParseOk _ gpd) = case condExecutables gpd of
+    getPackageDescription = readGenericPackageDescription silent
+    getExecutables' gpd = case condExecutables gpd of
         [] -> error "No executables found"
         ds -> map fst ds
 
@@ -145,8 +143,8 @@ prettyRunCommand cmd = do
     logCommand cmd
     (Inherited, out, err, cph) <- streamingProcess (shell cmd)
     runConcurrently $
-        Concurrently (out $$ (Conduit.Binary.lines =$ Conduit.List.mapM_ putLineGray)) *>
-        Concurrently (err $$ (Conduit.Binary.lines =$ Conduit.List.mapM_ putLineRed)) *>
+        Concurrently (runConduit $ out .| (Conduit.Binary.lines .| Conduit.List.mapM_ putLineGray)) *>
+        Concurrently (runConduit $ err .| (Conduit.Binary.lines .| Conduit.List.mapM_ putLineRed)) *>
         Concurrently (waitForStreamingProcess cph)
   where
     putLineSGR sgr b = do
